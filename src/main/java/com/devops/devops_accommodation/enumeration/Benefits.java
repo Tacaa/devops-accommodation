@@ -1,0 +1,24 @@
+package com.devops.devops_accommodation.enumeration;
+
+public enum Benefits {
+    WIFI,
+    FREE_PARKING,
+    AIR_CONDITIONING,
+    SWIMMING_POOL,
+    PET_FRIENDLY,
+    BREAKFAST_INCLUDED,
+    GYM_ACCESS,
+    SPA_SERVICES,
+    WHEELCHAIR_ACCESSIBLE,
+    BALCONY_OR_TERRACE,
+    OCEAN_VIEW,
+    GARDEN_VIEW,
+    PRIVATE_ENTRANCE,
+    FULLY_EQUIPPED_KITCHEN,
+    WASHING_MACHINE,
+    DRYER,
+    SMART_TV,
+    HEATING,
+    FIREPLACE,
+    BBQ_GRILL
+}
