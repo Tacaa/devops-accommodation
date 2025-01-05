@@ -1,0 +1,25 @@
+# Maven build folder
+target/
+
+# IntelliJ IDEA files
+.idea/
+*.iml
+
+# Help documentation
+HELP.md
+
+# Eclipse/STS files
+.classpath
+.project
+.settings/
+.springBeans
+
+# VS Code
+.vscode/
+
+# NetBeans
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
