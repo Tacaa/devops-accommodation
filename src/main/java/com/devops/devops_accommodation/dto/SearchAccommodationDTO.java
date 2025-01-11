@@ -2,8 +2,6 @@ package com.devops.devops_accommodation.dto;
 
 
 import lombok.*;
-import org.springframework.cglib.core.Local;
-
 import java.time.LocalDate;
 
 @Getter
