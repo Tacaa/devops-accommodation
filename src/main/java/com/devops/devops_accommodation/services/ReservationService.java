@@ -6,6 +6,7 @@ import com.devops.devops_accommodation.enumeration.RequestApproval;
 import com.devops.devops_accommodation.enumeration.RequestStatus;
 import com.devops.devops_accommodation.exceptions.AvailabilityNotExists;
 import com.devops.devops_accommodation.exceptions.NotFoundException;
+import com.devops.devops_accommodation.exceptions.ReservationCanNotCancel;
 import com.devops.devops_accommodation.exceptions.ReservationConflictException;
 import com.devops.devops_accommodation.model.Accommodation;
 import com.devops.devops_accommodation.model.Reservation;
@@ -13,6 +14,8 @@ import com.devops.devops_accommodation.repository.AccommodationRepository;
 import com.devops.devops_accommodation.repository.ReservationRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.time.LocalDate;
 
 @Service
 public class ReservationService {
@@ -68,6 +71,27 @@ public class ReservationService {
         }
     }
 
+    public ReservationRequestResponseDTO cancelOrDelete(Integer id){
+        Reservation reservation = reservationRepository.findById(id).orElseThrow(() -> new NotFoundException("Reservation not found"));
+
+        if(reservation.getStatus() == RequestStatus.PENDING){
+            reservation.setDeleted(true);
+            return ReservationRequestResponseDTO.from(reservation);
+        }else if(reservation.getStatus() == RequestStatus.ACCEPTED){
+            LocalDate today = LocalDate.now();
+
+            if (today.equals(reservation.getStartDate().minusDays(1)) | today.isAfter(reservation.getStartDate().minusDays(1))) {
+                throw new ReservationCanNotCancel("Too late to cancel reservation!");
+            } else {
+                reservation.setCanceled(true);
+
+                //TODO: kod usera povecati broj otkaza, ili na frontu ili na beku
+                return ReservationRequestResponseDTO.from(reservation);
+            }
+        }else{
+            throw new ReservationCanNotCancel("Reservation is already declined");
+        }
+    }
 
 
 }
