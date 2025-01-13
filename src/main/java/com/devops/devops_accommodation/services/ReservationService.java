@@ -16,6 +16,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 public class ReservationService {
@@ -93,5 +96,35 @@ public class ReservationService {
         }
     }
 
+    public List<ReservationRequestResponseDTO> getAllPendingReservationRequestsByHost(Integer id){
+        List<Reservation> reservations = reservationRepository.getAllPendingReservationRequestsByHost(id);
+        return reservations.stream()
+                .map(ReservationRequestResponseDTO::from)
+                .toList();
+    }
+
+    public List<ReservationRequestResponseDTO> saveReservationsManually(List<ReservationRequestResponseDTO> reservations) {
+        List<Integer> ids = reservations.stream()
+                .map(ReservationRequestResponseDTO::getId)
+                .toList();
+
+        List<Reservation> reservationsDB = reservationRepository.findListOfReservations(ids);
+
+        Map<Integer, ReservationRequestResponseDTO> reservationsMap = reservations.stream()
+                .collect(Collectors.toMap(ReservationRequestResponseDTO::getId, dto -> dto));
+
+        reservationsDB.forEach(reservation -> {
+            ReservationRequestResponseDTO matchingReservation = reservationsMap.get(reservation.getId());
+            if (matchingReservation != null) {
+                reservation.setStatus(matchingReservation.getStatus());
+            }
+        });
+
+        reservationsDB = reservationRepository.saveAll(reservationsDB);
+
+         return reservationsDB.stream()
+                .map(ReservationRequestResponseDTO::from)
+                .toList();
+    }
 
 }

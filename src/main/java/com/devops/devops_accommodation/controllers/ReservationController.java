@@ -13,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -67,4 +68,18 @@ public class ReservationController {
             return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
         }
     }
+
+    @GetMapping(value = "/all-host-pending-accommodation/{hostId}")
+    public ResponseEntity<List<ReservationRequestResponseDTO>> getAllUsers(@PathVariable Integer hostId) {
+        List<ReservationRequestResponseDTO> reservations = reservationService.getAllPendingReservationRequestsByHost(hostId);
+        return new ResponseEntity<>(reservations, HttpStatus.OK);
+    }
+
+    @PostMapping(value = "/save-manually-approved")
+    public ResponseEntity<List<ReservationRequestResponseDTO>> saveManuallyApprovedRequests(List<ReservationRequestResponseDTO> reservationRequestResponseDTO){
+        List<ReservationRequestResponseDTO> savedReservations = reservationService.saveReservationsManually(reservationRequestResponseDTO);
+        return new ResponseEntity<>(savedReservations, HttpStatus.OK);
+    }
+
+    
 }
