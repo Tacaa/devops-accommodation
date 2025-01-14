@@ -9,8 +9,10 @@ import com.devops.devops_accommodation.exceptions.NotFoundException;
 import com.devops.devops_accommodation.exceptions.ReservationCanNotCancel;
 import com.devops.devops_accommodation.exceptions.ReservationConflictException;
 import com.devops.devops_accommodation.model.Accommodation;
+import com.devops.devops_accommodation.model.Availability;
 import com.devops.devops_accommodation.model.Reservation;
 import com.devops.devops_accommodation.repository.AccommodationRepository;
+import com.devops.devops_accommodation.repository.AvailabilityRepository;
 import com.devops.devops_accommodation.repository.ReservationRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -28,6 +30,9 @@ public class ReservationService {
 
     @Autowired
     private AccommodationRepository accommodationRepository;
+
+    @Autowired
+    private AvailabilityRepository availabilityRepository;
 
     public ReservationRequestResponseDTO createReservationRequest(ReservationRequestDTO requestDTO) {
         Accommodation accommodation = accommodationRepository.findById(requestDTO.getAccommodationId())
@@ -125,6 +130,41 @@ public class ReservationService {
          return reservationsDB.stream()
                 .map(ReservationRequestResponseDTO::from)
                 .toList();
+    }
+
+
+    public void updateAvailabilityAfterReservation(Integer accommodationId, LocalDate startDate, LocalDate endDate) {
+        List<Availability> availabilities = availabilityRepository.findAvailabilitiesForReservation(accommodationId, startDate, endDate);
+
+        for (Availability availability : availabilities) {
+            // Ako postoji dio intervala prije rezervacije
+            if (availability.getStartDate().isBefore(startDate)) {
+                Availability before = new Availability();
+                before.setAccommodation(availability.getAccommodation());
+                before.setStartDate(availability.getStartDate());
+                before.setEndDate(startDate.minusDays(1));
+                before.setAvailable(true);
+                before.setDeleted(false);
+                before.setPrice(availability.getPrice());
+                availabilityRepository.save(before);
+            }
+
+            // Ako postoji dio intervala poslije rezervacije
+            if (availability.getEndDate().isAfter(endDate)) {
+                Availability after = new Availability();
+                after.setAccommodation(availability.getAccommodation());
+                after.setStartDate(endDate.plusDays(1));
+                after.setEndDate(availability.getEndDate());
+                after.setAvailable(true);
+                after.setDeleted(false);
+                after.setPrice(availability.getPrice());
+                availabilityRepository.save(after);
+            }
+
+            // Obriši originalni interval jer ga rezervacija pokriva
+            availability.setDeleted(true);
+            availabilityRepository.save(availability);
+        }
     }
 
 }

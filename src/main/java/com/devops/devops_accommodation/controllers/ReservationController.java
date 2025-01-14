@@ -80,6 +80,4 @@ public class ReservationController {
         List<ReservationRequestResponseDTO> savedReservations = reservationService.saveReservationsManually(reservationRequestResponseDTO);
         return new ResponseEntity<>(savedReservations, HttpStatus.OK);
     }
-
-    
 }
