@@ -28,10 +28,10 @@ public class AccommodationService {
             throw new AttributeNullException("Given accommodation attribute is null");
         }
 
-        if(createAccommodationDTO.getAddress().getStreet() == null
-            || createAccommodationDTO.getAddress().getStreet() == null
+        if(createAccommodationDTO.getAddress().getCity() == null
+            || createAccommodationDTO.getAddress().getNumber() == null
                 || createAccommodationDTO.getAddress().getStreet() == null
-                || createAccommodationDTO.getAddress().getStreet() == null){
+                || createAccommodationDTO.getAddress().getCountry() == null){
             throw new AttributeNullException("Given address attribute is null");
         }
 
