@@ -47,6 +47,7 @@ public class AvailabilityService {
         availability.setStartDate(createAvailabilityDTO.getStartDate());
         availability.setEndDate(createAvailabilityDTO.getEndDate());
         availability.setAvailable(true);
+        availability.setDeleted(false);
         availability.setPrice(createAvailabilityDTO.getPrice());
         return availabilityRepository.save(availability);
     }
@@ -61,8 +62,17 @@ public class AvailabilityService {
             throw new PeriodNotAvailable("Cannot update availability for this interval, there are reservations.");
         }
 
+        if(!availability.getStartDate().isEqual(createAvailabilityDTO.getStartDate()) || !availability.getEndDate().isEqual(createAvailabilityDTO.getEndDate())){
+            //provjera ako zeli promijeniti interval, moram vidjeti da li postoji taj interval vec, da li je zauzet
+            boolean hasAvailability = availabilityRepository.existsAvailabilityByAvailabilityIdAndDateRange(availability.getId(), availability.getAccommodation(), createAvailabilityDTO.getStartDate(), createAvailabilityDTO.getEndDate());
+            if (hasAvailability) {
+                throw new PeriodNotAvailable("Availability with that interval already exixsts!");
+            }
+        }
+
         availability.setStartDate(createAvailabilityDTO.getStartDate());
         availability.setEndDate(createAvailabilityDTO.getEndDate());
+        availability.setDeleted(createAvailabilityDTO.getDeleted());
         availability.setPrice(createAvailabilityDTO.getPrice());
 
         return availabilityRepository.save(availability);

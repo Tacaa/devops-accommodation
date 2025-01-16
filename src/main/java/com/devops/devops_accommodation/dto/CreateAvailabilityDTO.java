@@ -13,5 +13,6 @@ public class CreateAvailabilityDTO {
     private LocalDate startDate;
     private LocalDate endDate;
     private Double price;
+    private Boolean deleted;
     private Integer accommodationId;
 }

@@ -15,6 +15,7 @@ public class AvailabilityDTO {
     private LocalDate startDate;
     private LocalDate endDate;
     private Boolean available;
+    private Boolean deleted;
     private Double price;
     private Integer accommodationId;
 
@@ -25,6 +26,7 @@ public class AvailabilityDTO {
                 .endDate(availability.getEndDate())
                 .available(availability.getAvailable())
                 .price(availability.getPrice())
+                .deleted(availability.getDeleted())
                 .accommodationId(availability.getAccommodation().getId())
                 .build();
     }

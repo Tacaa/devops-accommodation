@@ -14,9 +14,20 @@ public interface AvailabilityRepository extends JpaRepository<Availability, Inte
 
     @Query("SELECT CASE WHEN COUNT(a) > 0 THEN true ELSE false END " +
             "FROM Availability a WHERE a.accommodation = :accommodation " +
-            "AND a.startDate = :startDate AND a.endDate = :endDate " +
-            "AND a.available = true")
+            "AND a.startDate <= :endDate AND a.endDate >= :startDate " +
+            "AND a.available = true AND a.deleted = false")
     boolean existsAvailabilityByAccommodationAndDateRange(
+            @Param("accommodation") Accommodation accommodation,
+            @Param("startDate") LocalDate startDate,
+            @Param("endDate") LocalDate endDate);
+
+
+    @Query("SELECT CASE WHEN COUNT(a) > 0 THEN true ELSE false END " +
+            "FROM Availability a WHERE a.id != :availabilityId AND a.accommodation = :accommodation " +
+            "AND a.startDate <= :endDate AND a.endDate >= :startDate " +
+            "AND a.available = true AND a.deleted = false")
+    boolean existsAvailabilityByAvailabilityIdAndDateRange(
+            @Param("availabilityId") Integer availabilityId,
             @Param("accommodation") Accommodation accommodation,
             @Param("startDate") LocalDate startDate,
             @Param("endDate") LocalDate endDate);

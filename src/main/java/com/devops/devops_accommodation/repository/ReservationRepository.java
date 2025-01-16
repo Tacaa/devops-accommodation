@@ -12,7 +12,7 @@ import java.time.LocalDate;
 public interface ReservationRepository extends JpaRepository<Reservation, Integer> {
     @Query("SELECT CASE WHEN COUNT(r) > 0 THEN true ELSE false END " +
             "FROM Reservation r WHERE r.accommodation = :accommodation " +
-            "AND r.startDate <= :endDate AND r.endDate >= :startDate")
+            "AND r.startDate <= :endDate AND r.endDate >= :startDate AND r.deleted = false AND r.canceled = false")
     boolean existsByAccommodationAndDateRange(
             @Param("accommodation") Accommodation accommodation,
             @Param("startDate") LocalDate startDate,
