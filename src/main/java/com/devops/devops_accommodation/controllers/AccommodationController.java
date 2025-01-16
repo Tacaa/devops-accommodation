@@ -15,7 +15,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @RestController
-@RequestMapping(value = "api/accommodation/")
+@RequestMapping(value = "api/accommodation")
 public class AccommodationController  {
 
     @GetMapping
