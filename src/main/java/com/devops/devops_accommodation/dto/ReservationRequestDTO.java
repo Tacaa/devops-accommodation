@@ -10,7 +10,6 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @Builder
 public class ReservationRequestDTO {
-    private Integer id;
     private Integer accommodationId;
     private LocalDate startDate;
     private LocalDate endDate;

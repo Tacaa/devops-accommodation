@@ -40,13 +40,11 @@ public class ReservationService {
 
         boolean isConflict = reservationRepository.existsReservation(
                 accommodation.getId(), requestDTO.getStartDate(), requestDTO.getEndDate());
-
         if (isConflict) {
             throw new ReservationConflictException("This accommodation is already reserved for the given date range");
         }
 
         boolean exist = accommodationRepository.checkAccommodationsAvailability(accommodation.getId(), requestDTO.getStartDate(), requestDTO.getEndDate());
-
         if(!exist){
             throw new AvailabilityNotExists("There is no availability for this accommodation in this period of time!");
         }
@@ -70,8 +68,9 @@ public class ReservationService {
     public Reservation updateRequestStatus(Reservation reservation){
         if(reservation.getAccommodation().getRequestApproval() == RequestApproval.AUTOMATIC){
             reservation.setStatus(RequestStatus.ACCEPTED);
+            //update availability
+            this.updateAvailabilityAfterReservation(reservation);
             return reservation;
-
         }else{
             //manuelno
             reservation.setStatus(RequestStatus.PENDING);
@@ -84,16 +83,25 @@ public class ReservationService {
 
         if(reservation.getStatus() == RequestStatus.PENDING){
             reservation.setDeleted(true);
+            reservationRepository.save(reservation);
             return ReservationRequestResponseDTO.from(reservation);
         }else if(reservation.getStatus() == RequestStatus.ACCEPTED){
             LocalDate today = LocalDate.now();
-
             if (today.equals(reservation.getStartDate().minusDays(1)) | today.isAfter(reservation.getStartDate().minusDays(1))) {
                 throw new ReservationCanNotCancel("Too late to cancel reservation!");
             } else {
                 reservation.setCanceled(true);
 
-                //TODO: kod usera povecati broj otkaza, ili na frontu ili na beku
+                Availability availability = availabilityRepository.findReservedAvailabilityToCancel(reservation.getAccommodation().getId(), reservation.getStartDate(), reservation.getEndDate());
+                if(availability != null){
+                    availability.setAvailable(true);
+                    availabilityRepository.save(availability);
+                }else{
+                    throw new NotFoundException("Availability not found!");
+                }
+
+                //TODO: kod usera povecati broj otkaza, ili na frontu ili na bek
+                reservationRepository.save(reservation);
                 return ReservationRequestResponseDTO.from(reservation);
             }
         }else{
@@ -122,6 +130,11 @@ public class ReservationService {
             ReservationRequestResponseDTO matchingReservation = reservationsMap.get(reservation.getId());
             if (matchingReservation != null) {
                 reservation.setStatus(matchingReservation.getStatus());
+                if(matchingReservation.getStatus() == RequestStatus.ACCEPTED){
+                    this.updateAvailabilityAfterReservation(reservation);
+                }else if(matchingReservation.getStatus() == RequestStatus.DECLINED){
+                    reservation.setCanceled(true);
+                }
             }
         });
 
@@ -133,16 +146,16 @@ public class ReservationService {
     }
 
 
-    public void updateAvailabilityAfterReservation(Integer accommodationId, LocalDate startDate, LocalDate endDate) {
-        List<Availability> availabilities = availabilityRepository.findAvailabilitiesForReservation(accommodationId, startDate, endDate);
+    public void updateAvailabilityAfterReservation(Reservation reservation) {
+        List<Availability> availabilities = availabilityRepository.findAvailabilitiesForReservation(reservation.getAccommodation().getId(), reservation.getStartDate(), reservation.getEndDate());
 
         for (Availability availability : availabilities) {
             // Ako postoji dio intervala prije rezervacije
-            if (availability.getStartDate().isBefore(startDate)) {
+            if (availability.getStartDate().isBefore(reservation.getStartDate())) {
                 Availability before = new Availability();
                 before.setAccommodation(availability.getAccommodation());
                 before.setStartDate(availability.getStartDate());
-                before.setEndDate(startDate.minusDays(1));
+                before.setEndDate(reservation.getStartDate().minusDays(1));
                 before.setAvailable(true);
                 before.setDeleted(false);
                 before.setPrice(availability.getPrice());
@@ -150,10 +163,10 @@ public class ReservationService {
             }
 
             // Ako postoji dio intervala poslije rezervacije
-            if (availability.getEndDate().isAfter(endDate)) {
+            if (availability.getEndDate().isAfter(reservation.getEndDate())) {
                 Availability after = new Availability();
                 after.setAccommodation(availability.getAccommodation());
-                after.setStartDate(endDate.plusDays(1));
+                after.setStartDate(reservation.getEndDate().plusDays(1));
                 after.setEndDate(availability.getEndDate());
                 after.setAvailable(true);
                 after.setDeleted(false);
@@ -165,6 +178,25 @@ public class ReservationService {
             availability.setDeleted(true);
             availabilityRepository.save(availability);
         }
+
+        //napravi availability za rezervaciju, ukoliko se otkaze da postane dostupan
+        Availability availability = new Availability();
+        availability.setAccommodation(reservation.getAccommodation());
+        availability.setStartDate(reservation.getStartDate());
+        availability.setEndDate(reservation.getEndDate());
+        availability.setAvailable(false);
+        availability.setDeleted(false);
+
+        if(availabilities.isEmpty()){
+            availability.setPrice(500.0);
+        }else{
+            double totalPrice = 0.0;
+            for (Availability a : availabilities) {
+                totalPrice += a.getPrice();
+            }
+            availability.setPrice(totalPrice / availabilities.size());
+        }
+        availabilityRepository.save(availability);
     }
 
 }

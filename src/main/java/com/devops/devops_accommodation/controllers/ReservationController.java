@@ -24,7 +24,7 @@ public class ReservationController {
     private ReservationService reservationService;
 
     @PostMapping
-    public ResponseEntity<Map<String, Object>> createAvailability(@RequestBody ReservationRequestDTO reservationRequestDTO) {
+    public ResponseEntity<Map<String, Object>> createReservation(@RequestBody ReservationRequestDTO reservationRequestDTO) {
         try {
             ReservationRequestResponseDTO reservationRequestResponseDTO = reservationService.createReservationRequest(reservationRequestDTO);
             Map<String, Object> response = new HashMap<>();
@@ -76,7 +76,7 @@ public class ReservationController {
     }
 
     @PostMapping(value = "/save-manually-approved")
-    public ResponseEntity<List<ReservationRequestResponseDTO>> saveManuallyApprovedRequests(List<ReservationRequestResponseDTO> reservationRequestResponseDTO){
+    public ResponseEntity<List<ReservationRequestResponseDTO>> saveManuallyApprovedRequests(@RequestBody List<ReservationRequestResponseDTO> reservationRequestResponseDTO){
         List<ReservationRequestResponseDTO> savedReservations = reservationService.saveReservationsManually(reservationRequestResponseDTO);
         return new ResponseEntity<>(savedReservations, HttpStatus.OK);
     }
