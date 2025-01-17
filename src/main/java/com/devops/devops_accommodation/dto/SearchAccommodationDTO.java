@@ -9,8 +9,8 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @AllArgsConstructor
 public class SearchAccommodationDTO {
-    private String city;
-    private String country;
+    private String city; //obavezan unos
+    private String country; //obavezan unos
     private Integer numGuest; //obavezan unos
     private LocalDate startDate; //obavezan unos
     private LocalDate endDate; //obavezan unos

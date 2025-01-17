@@ -38,6 +38,14 @@ public class AccommodationService {
                 searchDTO.getCity(), searchDTO.getCountry(), searchDTO.getNumGuest(),
                 searchDTO.getStartDate(), searchDTO.getEndDate());
 
+        List<Accommodation> reservedAccommodations = accommodationRepository.searchReservedAccommodations(searchDTO.getCity(), searchDTO.getCountry(), searchDTO.getNumGuest(),
+                searchDTO.getStartDate(), searchDTO.getEndDate());
+
+        //izbaciti accommodations koji imaju rezervaciju za taj period tko da dobijem samo slobodne
+        for (Accommodation reserved : reservedAccommodations) {
+            accommodations.removeIf(a -> a.getId().equals(reserved.getId()));
+        }
+
         return accommodations.stream()
                 .map(accommodation -> {
                     List<Availability> availabilities = accommodation.getAvailabilities().stream()
