@@ -28,6 +28,9 @@ public class Availability {
     @Column(name = "is_available", nullable = false)
     private Boolean available;
 
+    @Column(name = "is_deleted", nullable = false)
+    private Boolean deleted;
+
     @Column(name = "price", nullable = false)
     private Double price;
 
