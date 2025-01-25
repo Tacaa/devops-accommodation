@@ -104,6 +104,7 @@ class AccommodationServiceTest {
     verify(accommodationRepository, never()).save(any(Accommodation.class));
   }
 
+  @Test
   void create_shouldThrowAttributeNullException_whenBuildingNumberIsNull() {
     // Arrange
     CreateAccommodationDTO createAccommodationDTO = new CreateAccommodationDTO(
