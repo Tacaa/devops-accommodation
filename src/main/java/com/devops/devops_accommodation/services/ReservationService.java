@@ -199,4 +199,13 @@ public class ReservationService {
         availabilityRepository.save(availability);
     }
 
+    //za potrebe ocjene
+    public boolean didGuestHadReservationInAccommodation(Integer guestId, Integer accommodationId){
+        return reservationRepository.didGuestHadReservationInAccommodation(accommodationId, guestId);
+    }
+
+    public boolean didGuestHadReservationInHostAccommodation(Integer guestId, Integer hostId){
+        return reservationRepository.didGuestHadReservationInHostAccommodation(hostId, guestId);
+    }
+
 }

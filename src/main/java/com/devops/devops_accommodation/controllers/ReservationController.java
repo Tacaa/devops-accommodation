@@ -80,4 +80,21 @@ public class ReservationController {
         List<ReservationRequestResponseDTO> savedReservations = reservationService.saveReservationsManually(reservationRequestResponseDTO);
         return new ResponseEntity<>(savedReservations, HttpStatus.OK);
     }
+
+    @GetMapping(value = "/did-guest-had-reservation-in-accommodation")
+    @ResponseStatus(HttpStatus.OK)
+    public Boolean didGuestHadReservationInAccommodation(@RequestParam Integer guestId, @RequestParam Integer accommodationId) {
+        System.out.println("Tatjana");
+        return reservationService.didGuestHadReservationInAccommodation(guestId, accommodationId);
+    }
+
+
+    @GetMapping(value = "/did-guest-had-reservation-in-host-accommodation")
+    @ResponseStatus(HttpStatus.OK)
+    public Boolean didGuestHadReservationInHostAccommodation(@RequestParam Integer guestId, @RequestParam Integer hostId) {
+        return reservationService.didGuestHadReservationInHostAccommodation(guestId, hostId);
+    }
+
+
+
 }

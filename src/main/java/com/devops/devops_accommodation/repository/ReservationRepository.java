@@ -19,4 +19,11 @@ public interface ReservationRepository extends JpaRepository<Reservation, Intege
 
     @Query("SELECT r FROM Reservation r WHERE r.id IN :ids")
     List<Reservation> findListOfReservations(@Param("ids") List<Integer> ids);
+
+    @Query("SELECT CASE WHEN COUNT(r) > 0 THEN true ELSE false END FROM Reservation r WHERE r.accommodation.id = :accommodationId AND r.guestId = :guestId")
+    boolean didGuestHadReservationInAccommodation(@Param("accommodationId") Integer accommodationId, @Param("guestId") Integer guestId);
+
+    @Query("SELECT COUNT(r) > 0 FROM Reservation r WHERE r.accommodation.hostId = :hostId AND r.guestId = :guestId")
+    boolean didGuestHadReservationInHostAccommodation(@Param("hostId") Integer hostId, @Param("guestId") Integer guestId);
+
 }
