@@ -23,7 +23,7 @@ public class ReservationController {
     @Autowired
     private ReservationService reservationService;
 
-    @PostMapping
+    @PostMapping({"", "/"})
     public ResponseEntity<Map<String, Object>> createReservation(@RequestBody ReservationRequestDTO reservationRequestDTO) {
         try {
             ReservationRequestResponseDTO reservationRequestResponseDTO = reservationService.createReservationRequest(reservationRequestDTO);

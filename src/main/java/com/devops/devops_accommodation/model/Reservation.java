@@ -2,10 +2,7 @@ package com.devops.devops_accommodation.model;
 
 import com.devops.devops_accommodation.enumeration.RequestStatus;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.time.LocalDate;
 
@@ -15,6 +12,7 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @Entity
 @Table(name = "reservations")
+@Builder
 public class Reservation {
 
     @Id

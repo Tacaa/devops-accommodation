@@ -4,10 +4,7 @@ import com.devops.devops_accommodation.enumeration.Benefits;
 import com.devops.devops_accommodation.enumeration.PriceType;
 import com.devops.devops_accommodation.enumeration.RequestApproval;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -20,6 +17,7 @@ import java.util.Set;
 @AllArgsConstructor
 @Entity
 @Table(name = "accommodations")
+@Builder
 public class Accommodation {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
