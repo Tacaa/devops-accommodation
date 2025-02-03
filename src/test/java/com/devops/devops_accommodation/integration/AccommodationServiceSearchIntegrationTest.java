@@ -9,7 +9,7 @@ import com.devops.devops_accommodation.exceptions.AttributeNullException;
 import com.devops.devops_accommodation.model.Accommodation;
 import com.devops.devops_accommodation.model.Address;
 import com.devops.devops_accommodation.model.Availability;
-import com.devops.devops_accommodation.repository.AccommodationRepository;;
+import com.devops.devops_accommodation.repository.AccommodationRepository;
 import com.devops.devops_accommodation.services.AccommodationService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
