@@ -27,7 +27,7 @@ public class Accommodation {
     private String name;
 
     @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
-    @JoinColumn(name = "address_id", referencedColumnName = "id")
+    @JoinColumn(name = "address_id", nullable = false, referencedColumnName = "id")
     private Address address;
 
     @ElementCollection(targetClass = Benefits.class, fetch = FetchType.EAGER)
@@ -56,11 +56,11 @@ public class Accommodation {
     @Column(name = "request_approval", nullable = false)
     private RequestApproval requestApproval;
 
-    @OneToMany(mappedBy = "accommodation", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Availability> availabilities = new ArrayList<>();
-
     @Column(name = "host_id", nullable = false)
     private Integer hostId;
+
+    @OneToMany(mappedBy = "accommodation", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Availability> availabilities = new ArrayList<>();
 
     public void addAvailability(Availability availability) {
         availabilities.add(availability);
