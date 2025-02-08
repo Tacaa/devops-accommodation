@@ -5,3 +5,4 @@ public class AttributeNullException extends RuntimeException {
         super(message);
     }
 }
+
