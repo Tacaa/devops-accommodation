@@ -13,6 +13,9 @@ import com.devops.devops_accommodation.repository.AccommodationRepository;
 import com.devops.devops_accommodation.repository.AvailabilityRepository;
 import com.devops.devops_accommodation.repository.ReservationRepository;
 import com.devops.devops_accommodation.services.AvailabilityService;
+import jakarta.transaction.Transactional;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +29,7 @@ import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+@Transactional
 @SpringBootTest
 @ActiveProfiles("test")
 public class AvailabilityServiceIntegrationTest extends BaseIntegrationTest {
@@ -82,6 +86,18 @@ public class AvailabilityServiceIntegrationTest extends BaseIntegrationTest {
                 .deleted(false)
                 .accommodationId(accommodation.getId())
                 .build();
+    }
+
+    @AfterEach
+    void tearDown() {
+        accommodationRepository.deleteAll();
+    }
+
+    @AfterAll
+    static void afterAll() {
+        if (postgres != null && postgres.isRunning()) {
+            postgres.stop();
+        }
     }
 
     @Test
