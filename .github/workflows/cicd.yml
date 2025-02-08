@@ -72,7 +72,7 @@ jobs:
           password: ${{ secrets.DOCKER_PASSWORD }}
 
       - name: Build Docker image
-        run: docker build -t ${{ secrets.DOCKER_USERNAME }}/my-spring-boot-app:latest .
+        run: docker build -t ${{ secrets.DOCKER_USERNAME }}/devops-accommodation:latest .
 
       - name: Tag Docker image
         run: |
@@ -82,5 +82,5 @@ jobs:
 
       - name: Push Docker image
         run: |
-          docker push ${{ secrets.DOCKER_USERNAME }}/my-spring-boot-app:latest
-          docker push ${{ secrets.DOCKER_USERNAME }}/my-spring-boot-app:${{ env.IMAGE_TAG }}
+          docker push ${{ secrets.DOCKER_USERNAME }}/devops-accommodation:latest
+          docker push ${{ secrets.DOCKER_USERNAME }}/devops-accommodation:${{ env.IMAGE_TAG }}
