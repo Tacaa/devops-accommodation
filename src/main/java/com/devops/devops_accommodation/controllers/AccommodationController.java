@@ -20,8 +20,8 @@ public class AccommodationController  {
 
     @GetMapping
     public String home() {
-    return "Hello, World!";
-}
+      return "Hello, World!";
+    }
 
     @Autowired
     private AccommodationService accommodationService;
