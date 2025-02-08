@@ -1,6 +1,5 @@
 package com.devops.devops_accommodation.dto;
 
-
 import com.devops.devops_accommodation.model.Address;
 import lombok.*;
 
@@ -36,4 +35,3 @@ public class AddressDTO {
     }
 
 }
-

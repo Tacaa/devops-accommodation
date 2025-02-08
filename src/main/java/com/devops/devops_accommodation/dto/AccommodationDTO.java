@@ -1,6 +1,5 @@
 package com.devops.devops_accommodation.dto;
 
-
 import com.devops.devops_accommodation.enumeration.Benefits;
 import com.devops.devops_accommodation.enumeration.PriceType;
 import com.devops.devops_accommodation.enumeration.RequestApproval;
