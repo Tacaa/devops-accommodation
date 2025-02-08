@@ -8,24 +8,13 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class AddressDTO {
-    private Integer id;
+public class CreateAddressDTO {
     private String street;
     private Integer number;
     private String city;
     private String country;
 
-    public static AddressDTO from(Address address) {
-        return AddressDTO.builder()
-                .id(address.getId())
-                .street(address.getStreet())
-                .number(address.getNumber())
-                .city(address.getCity())
-                .country(address.getCountry())
-                .build();
-    }
-
-    public static Address from(AddressDTO addressDTO){
+    public static Address from(CreateAddressDTO addressDTO){
         return Address.builder()
                 .street(addressDTO.getStreet())
                 .number(addressDTO.getNumber())
@@ -33,5 +22,4 @@ public class AddressDTO {
                 .country(addressDTO.getCountry())
                 .build();
     }
-
 }

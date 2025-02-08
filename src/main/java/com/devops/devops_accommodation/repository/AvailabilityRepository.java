@@ -10,7 +10,27 @@ import java.time.LocalDate;
 import java.util.List;
 
 public interface AvailabilityRepository extends JpaRepository<Availability, Integer> {
-    List<Availability> findByAccommodationId(Integer accommodationId);
+    @Query("SELECT CASE WHEN COUNT(a) > 0 THEN true ELSE false END " +
+            "FROM Availability a WHERE a.accommodation = :accommodation " +
+            "AND a.startDate <= :endDate AND a.endDate >= :startDate " +
+            "AND a.available = true AND a.deleted = false")
+    boolean existsAvailabilityByAccommodationAndDateRange(
+            @Param("accommodation") Accommodation accommodation,
+            @Param("startDate") LocalDate startDate,
+            @Param("endDate") LocalDate endDate);
+
+
+    @Query("SELECT CASE WHEN COUNT(a) > 0 THEN true ELSE false END " +
+            "FROM Availability a WHERE a.id != :availabilityId AND a.accommodation = :accommodation " +
+            "AND a.startDate <= :endDate AND a.endDate >= :startDate " +
+            "AND a.available = true AND a.deleted = false")
+    boolean existsAvailabilityByAvailabilityIdAndDateRange(
+            @Param("availabilityId") Integer availabilityId,
+            @Param("accommodation") Accommodation accommodation,
+            @Param("startDate") LocalDate startDate,
+            @Param("endDate") LocalDate endDate);
+  
+   List<Availability> findByAccommodationId(Integer accommodationId);
 
     @Query("SELECT DISTINCT av FROM Availability av WHERE av.available = true AND :startDate <= av.endDate AND :endDate >= av.startDate AND av.accommodation.id = :accommodationId")
     List<Availability> findAvailabilitiesForReservation(
@@ -23,5 +43,5 @@ public interface AvailabilityRepository extends JpaRepository<Availability, Inte
             @Param("accommodationId") Integer accommodationId,
             @Param("startDate") LocalDate startDate,
             @Param("endDate") LocalDate endDate);
-
 }
+

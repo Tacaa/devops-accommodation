@@ -40,4 +40,5 @@ public class AccommodationDTO {
                 .hostId(accommodation.getHostId())
                 .build();
     }
+
 }
