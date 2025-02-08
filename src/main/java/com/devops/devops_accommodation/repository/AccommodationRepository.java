@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDate;
+import java.util.List;
 
 
 public interface AccommodationRepository extends JpaRepository<Accommodation, Integer> {
@@ -17,7 +18,7 @@ public interface AccommodationRepository extends JpaRepository<Accommodation, In
             @Param("endDate") LocalDate endDate);
     
   @Query("SELECT DISTINCT a FROM Accommodation a JOIN a.address addr JOIN a.availabilities av WHERE addr.city = :city AND addr.country = :country AND a.minGuests <= :numGuest AND a.maxGuests >= :numGuest AND av.available = true AND :startDate <= av.endDate AND :endDate >= av.startDate AND av.deleted = false")
-    List<Accommodation> searchAccommodations(
+  List<Accommodation> searchAccommodations(
             @Param("city") String city,
             @Param("country") String country,
             @Param("numGuest") Integer numGuest,
