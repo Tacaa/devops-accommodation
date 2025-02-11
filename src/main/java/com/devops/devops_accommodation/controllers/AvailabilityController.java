@@ -25,7 +25,7 @@ public class AvailabilityController {
     private AvailabilityService availabilityService;
 
 
-    @GetMapping
+    @GetMapping("/{accommodationId}")
     public ResponseEntity<List<AvailabilityDTO>> getAvailabilities(
             @PathVariable Integer accommodationId) {
         List<Availability> availabilities = availabilityService.getAllAvailabilitiesByAccommodationId(accommodationId);
