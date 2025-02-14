@@ -37,7 +37,7 @@ public class Accommodation {
     @Column(name = "benefit")
     private Set<Benefits> benefits = new HashSet<>();
 
-    @ElementCollection
+    @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "accommodation_photos", joinColumns = @JoinColumn(name = "accommodation_id"))
     @Column(name = "photo_url")
     private List<String> photos = new ArrayList<>();
