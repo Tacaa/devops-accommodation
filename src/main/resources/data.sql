@@ -12,17 +12,17 @@ INSERT INTO addresses (street, number_of_building, city, country) VALUES
 ('Bay Road', 20, 'San Francisco', 'USA');
 
 -- ACCOMMODATIONS
-INSERT INTO accommodations (name, address_id, min_guests, max_guests, price_type, request_approval, host_id) VALUES
-('Seaside Villa', 1, 2, 6, 'BY_ACCOMMODATION', 'MANUALLY', 16),
-('Mountain Retreat', 2, 1, 4, 'BY_PERSON', 'AUTOMATIC', 16),
-('City Apartment', 3, 1, 2, 'BY_PERSON', 'MANUALLY', 17),
-('Countryside Cottage', 4, 3, 8, 'BY_ACCOMMODATION', 'AUTOMATIC', 18),
-('Beach House', 5, 4, 10, 'BY_PERSON', 'MANUALLY', 19),
-('Luxury Penthouse', 6, 1, 2, 'BY_ACCOMMODATION', 'AUTOMATIC', 20),
-('Family Bungalow', 7, 2, 6, 'BY_PERSON', 'MANUALLY', 20),
-('Rustic Lodge', 8, 2, 5, 'BY_PERSON', 'AUTOMATIC', 21),
-('Modern Studio', 9, 1, 2, 'BY_ACCOMMODATION', 'MANUALLY', 21),
-('Historic Mansion', 10, 5, 15, 'BY_ACCOMMODATION', 'AUTOMATIC', 22);
+INSERT INTO accommodations (name, address_id, min_guests, max_guests, price_type, request_approval, host_id, is_deleted) VALUES
+('Seaside Villa', 1, 2, 6, 'BY_ACCOMMODATION', 'MANUALLY', 16, false),
+('Mountain Retreat', 2, 1, 4, 'BY_PERSON', 'AUTOMATIC', 16, false),
+('City Apartment', 3, 1, 2, 'BY_PERSON', 'MANUALLY', 17, false),
+('Countryside Cottage', 4, 3, 8, 'BY_ACCOMMODATION', 'AUTOMATIC', 18, false),
+('Beach House', 5, 4, 10, 'BY_PERSON', 'MANUALLY', 19, false),
+('Luxury Penthouse', 6, 1, 2, 'BY_ACCOMMODATION', 'AUTOMATIC', 20, false),
+('Family Bungalow', 7, 2, 6, 'BY_PERSON', 'MANUALLY', 20, false),
+('Rustic Lodge', 8, 2, 5, 'BY_PERSON', 'AUTOMATIC', 21, false),
+('Modern Studio', 9, 1, 2, 'BY_ACCOMMODATION', 'MANUALLY', 21, false),
+('Historic Mansion', 10, 5, 15, 'BY_ACCOMMODATION', 'AUTOMATIC', 22, false);
 
 INSERT INTO accommodation_benefits (accommodation_id, benefit) VALUES
 (1, 'WIFI'), (1, 'FREE_PARKING'), (1, 'AIR_CONDITIONING'),

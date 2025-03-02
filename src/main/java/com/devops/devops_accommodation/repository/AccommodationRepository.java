@@ -17,7 +17,7 @@ public interface AccommodationRepository extends JpaRepository<Accommodation, In
             @Param("startDate") LocalDate startDate,
             @Param("endDate") LocalDate endDate);
     
-  @Query("SELECT DISTINCT a FROM Accommodation a JOIN a.address addr JOIN a.availabilities av WHERE addr.city = :city AND addr.country = :country AND a.minGuests <= :numGuest AND a.maxGuests >= :numGuest AND av.available = true AND :startDate <= av.endDate AND :endDate >= av.startDate AND av.deleted = false")
+  @Query("SELECT DISTINCT a FROM Accommodation a JOIN a.address addr JOIN a.availabilities av WHERE a.deleted = false AND addr.city = :city AND addr.country = :country AND a.minGuests <= :numGuest AND a.maxGuests >= :numGuest AND av.available = true AND :startDate <= av.endDate AND :endDate >= av.startDate AND av.deleted = false")
   List<Accommodation> searchAccommodations(
             @Param("city") String city,
             @Param("country") String country,
@@ -26,7 +26,7 @@ public interface AccommodationRepository extends JpaRepository<Accommodation, In
             @Param("endDate") LocalDate endDate);
 
 
-    @Query("SELECT DISTINCT a FROM Accommodation a JOIN a.address addr JOIN a.reservations r WHERE addr.city = :city AND addr.country = :country AND a.minGuests <= :numGuest AND a.maxGuests >= :numGuest AND :startDate <= r.endDate AND :endDate >= r.startDate AND r.deleted = false AND r.canceled = false")
+    @Query("SELECT DISTINCT a FROM Accommodation a JOIN a.address addr JOIN a.reservations r WHERE a.deleted = false AND addr.city = :city AND addr.country = :country AND a.minGuests <= :numGuest AND a.maxGuests >= :numGuest AND :startDate <= r.endDate AND :endDate >= r.startDate AND r.deleted = false AND r.canceled = false")
     List<Accommodation> searchReservedAccommodations(
             @Param("city") String city,
             @Param("country") String country,
@@ -35,4 +35,6 @@ public interface AccommodationRepository extends JpaRepository<Accommodation, In
             @Param("endDate") LocalDate endDate);
 
 
+    @Query("SELECT a FROM Accommodation a WHERE a.hostId = :hostId AND a.deleted = false")
+    List<Accommodation> findAllByHostId(@Param("hostId") Integer hostId);
 }

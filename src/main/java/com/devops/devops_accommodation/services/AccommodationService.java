@@ -124,9 +124,18 @@ public class AccommodationService {
                 .priceType(createAccommodationDTO.getPriceType())
                 .requestApproval(createAccommodationDTO.getRequestApproval())
                 .hostId(createAccommodationDTO.getHostId())
+                .deleted(false)
                 .build();
 
         return accommodationRepository.save(accommodation);
+    }
+
+    public void deleteAllHostAccommodations(Integer hostId){
+        List<Accommodation> allAccommodationsOfHost = accommodationRepository.findAllByHostId(hostId);
+        for(Accommodation accommodation : allAccommodationsOfHost){
+            accommodation.setDeleted(true);
+        }
+        accommodationRepository.saveAll(allAccommodationsOfHost);
     }
 
 }

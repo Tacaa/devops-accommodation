@@ -25,6 +25,7 @@ public class AccommodationDTO {
     private PriceType priceType;
     private RequestApproval requestApproval;
     private Integer hostId;
+    private Boolean deleted;
 
     public static AccommodationDTO from(Accommodation accommodation) {
         return AccommodationDTO.builder()
@@ -38,6 +39,7 @@ public class AccommodationDTO {
                 .priceType(accommodation.getPriceType())
                 .requestApproval(accommodation.getRequestApproval())
                 .hostId(accommodation.getHostId())
+                .deleted(accommodation.isDeleted())
                 .build();
     }
 

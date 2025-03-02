@@ -16,6 +16,7 @@ import com.devops.devops_accommodation.repository.AvailabilityRepository;
 import com.devops.devops_accommodation.repository.ReservationRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -206,6 +207,23 @@ public class ReservationService {
 
     public boolean didGuestHadReservationInHostAccommodation(Integer guestId, Integer hostId){
         return reservationRepository.didGuestHadReservationInHostAccommodation(hostId, guestId);
+    }
+
+    public boolean isGuestHavingReservationAtMoment(Integer guestId) {
+        return reservationRepository.isGuestHavingReservationAtMoment(guestId, LocalDate.now());
+    }
+
+    public boolean isHostHavingReservationAtMoment(Integer hostId) {
+       //pronadji sve smjestaje jednog hosta
+        List<Accommodation> allAccommodationsOfHost = accommodationRepository.findAllByHostId(hostId);
+
+        //nad svakim provjeri da li postoji rezervacija, prvi koji pronadjes vracas false
+        for(Accommodation accommodation : allAccommodationsOfHost){
+            if(reservationRepository.isAccommodationHavingReservationAtMoment(accommodation.getId(), LocalDate.now())){
+                return true;
+            }
+        }
+        return false;
     }
 
 }

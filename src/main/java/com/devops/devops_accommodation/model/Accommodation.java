@@ -59,6 +59,9 @@ public class Accommodation {
     @Column(name = "host_id", nullable = false)
     private Integer hostId;
 
+    @Column(name = "is_deleted", nullable = false)
+    private boolean deleted;
+
     @OneToMany(mappedBy = "accommodation", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Availability> availabilities = new ArrayList<>();
 
