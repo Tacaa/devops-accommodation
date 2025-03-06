@@ -74,12 +74,16 @@ public class AccommodationServiceSearchUnitTest {
         mockAccommodation.setName("Test Accommodation");
         mockAccommodation.setPriceType(PriceType.BY_ACCOMMODATION);
 
-        // Setup availability
+        // Setup availability with proper bidirectional relationship
         Availability availability = new Availability();
         availability.setStartDate(LocalDate.now().minusDays(1));
         availability.setEndDate(LocalDate.now().plusDays(3));
         availability.setPrice(100.0);
         availability.setAvailable(true);
+
+        // Set the accommodation reference in the availability object
+        availability.setAccommodation(mockAccommodation);
+
         mockAccommodation.setAvailabilities(List.of(availability));
 
         mockAccommodations = List.of(mockAccommodation);
