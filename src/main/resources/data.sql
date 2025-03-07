@@ -77,8 +77,10 @@ INSERT INTO availabilities (start_date, end_date, is_available, is_deleted, pric
 ('2025-05-26', '2025-05-28', FALSE, FALSE, 342.00, 4),
 
 ('2025-05-11', '2025-05-14', FALSE, FALSE, 500.00, 5),
-('2025-05-26', '2025-05-28', FALSE, FALSE, 544.00, 5);
+('2025-05-26', '2025-05-28', FALSE, FALSE, 544.00, 5),
 
+('2025-07-01', '2025-07-04', TRUE, FALSE, 500.00, 1),
+('2025-07-05', '2025-07-10', TRUE, FALSE, 544.00, 1);
 
 INSERT INTO reservations (start_date, end_date, guest_num, status, is_deleted, is_canceled, accommodation_id, guest_id) VALUES
 ('2025-05-08', '2025-05-09', 2, 'ACCEPTED', FALSE, FALSE, 1, 1),
@@ -95,4 +97,7 @@ INSERT INTO reservations (start_date, end_date, guest_num, status, is_deleted, i
 ('2025-05-26', '2025-05-28', 1, 'ACCEPTED', FALSE, FALSE, 4, 9),
 
 ('2025-05-11', '2025-05-14', 6, 'ACCEPTED', FALSE, FALSE, 5, 10),
-('2025-05-26', '2025-05-28', 3, 'ACCEPTED', FALSE, FALSE, 5, 11);
+('2025-05-26', '2025-05-28', 3, 'ACCEPTED', FALSE, FALSE, 5, 11),
+
+('2025-07-01', '2025-07-04', 3, 'PENDING', FALSE, FALSE, 1, 2),
+('2025-07-05', '2025-07-10', 4, 'PENDING', FALSE, FALSE, 1, 5);
