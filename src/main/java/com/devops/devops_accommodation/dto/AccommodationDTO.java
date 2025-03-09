@@ -4,6 +4,8 @@ import com.devops.devops_accommodation.enumeration.Benefits;
 import com.devops.devops_accommodation.enumeration.PriceType;
 import com.devops.devops_accommodation.enumeration.RequestApproval;
 import com.devops.devops_accommodation.model.Accommodation;
+import java.util.ArrayList;
+import java.util.HashSet;
 import lombok.*;
 
 import java.util.List;
@@ -28,19 +30,24 @@ public class AccommodationDTO {
     private Boolean deleted;
 
     public static AccommodationDTO from(Accommodation accommodation) {
+        if (accommodation == null) {
+            return null;
+        }
+
         return AccommodationDTO.builder()
-                .id(accommodation.getId())
-                .name(accommodation.getName())
-                .address(AddressDTO.from(accommodation.getAddress()))
-                .benefits(accommodation.getBenefits())
-                .photos(accommodation.getPhotos())
-                .minGuests(accommodation.getMinGuests())
-                .maxGuests(accommodation.getMaxGuests())
-                .priceType(accommodation.getPriceType())
-                .requestApproval(accommodation.getRequestApproval())
-                .hostId(accommodation.getHostId())
-                .deleted(accommodation.isDeleted())
-                .build();
+            .id(accommodation.getId())
+            .name(accommodation.getName())
+            .address(accommodation.getAddress() != null ? AddressDTO.from(accommodation.getAddress()) : null)
+            .benefits(accommodation.getBenefits() != null ? accommodation.getBenefits() : new HashSet<>())
+            .photos(accommodation.getPhotos() != null ? accommodation.getPhotos() : new ArrayList<>())
+            .minGuests(accommodation.getMinGuests() != null ? accommodation.getMinGuests() : 0)
+            .maxGuests(accommodation.getMaxGuests() != null ? accommodation.getMaxGuests() : 0)
+            .priceType(accommodation.getPriceType())
+            .requestApproval(accommodation.getRequestApproval())
+            .hostId(accommodation.getHostId())
+            .deleted(accommodation.isDeleted())
+            .build();
+
     }
 
 }
