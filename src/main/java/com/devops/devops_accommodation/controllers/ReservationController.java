@@ -95,6 +95,15 @@ public class ReservationController {
         return reservationService.didGuestHadReservationInHostAccommodation(guestId, hostId);
     }
 
+    @GetMapping(value = "/is-guest-having-reservation-at-moment")
+    @ResponseStatus(HttpStatus.OK)
+    public Boolean isGuestHavingReservationAtMoment(@RequestParam Integer guestId){
+        return reservationService.isGuestHavingReservationAtMoment(guestId);
+    }
 
-
+    @GetMapping(value = "/is-host-having-reservation-at-moment")
+    @ResponseStatus(HttpStatus.OK)
+    public Boolean isHostHavingReservationAtMoment(@RequestParam Integer hostId){
+        return reservationService.isHostHavingReservationAtMoment(hostId);
+    }
 }

@@ -12,17 +12,17 @@ INSERT INTO addresses (street, number_of_building, city, country) VALUES
 ('Bay Road', 20, 'San Francisco', 'USA');
 
 -- ACCOMMODATIONS
-INSERT INTO accommodations (name, address_id, min_guests, max_guests, price_type, request_approval, host_id) VALUES
-('Seaside Villa', 1, 2, 6, 'BY_ACCOMMODATION', 'MANUALLY', 16),
-('Mountain Retreat', 2, 1, 4, 'BY_PERSON', 'AUTOMATIC', 16),
-('City Apartment', 3, 1, 2, 'BY_PERSON', 'MANUALLY', 17),
-('Countryside Cottage', 4, 3, 8, 'BY_ACCOMMODATION', 'AUTOMATIC', 18),
-('Beach House', 5, 4, 10, 'BY_PERSON', 'MANUALLY', 19),
-('Luxury Penthouse', 6, 1, 2, 'BY_ACCOMMODATION', 'AUTOMATIC', 20),
-('Family Bungalow', 7, 2, 6, 'BY_PERSON', 'MANUALLY', 20),
-('Rustic Lodge', 8, 2, 5, 'BY_PERSON', 'AUTOMATIC', 21),
-('Modern Studio', 9, 1, 2, 'BY_ACCOMMODATION', 'MANUALLY', 21),
-('Historic Mansion', 10, 5, 15, 'BY_ACCOMMODATION', 'AUTOMATIC', 22);
+INSERT INTO accommodations (name, address_id, min_guests, max_guests, price_type, request_approval, host_id, is_deleted) VALUES
+('Seaside Villa', 1, 2, 6, 'BY_ACCOMMODATION', 'MANUALLY', 16, false),
+('Mountain Retreat', 2, 1, 4, 'BY_PERSON', 'AUTOMATIC', 16, false),
+('City Apartment', 3, 1, 2, 'BY_PERSON', 'MANUALLY', 17, false),
+('Countryside Cottage', 4, 3, 8, 'BY_ACCOMMODATION', 'AUTOMATIC', 18, false),
+('Beach House', 5, 4, 10, 'BY_PERSON', 'MANUALLY', 19, false),
+('Luxury Penthouse', 6, 1, 2, 'BY_ACCOMMODATION', 'AUTOMATIC', 20, false),
+('Family Bungalow', 7, 2, 6, 'BY_PERSON', 'MANUALLY', 20, false),
+('Rustic Lodge', 8, 2, 5, 'BY_PERSON', 'AUTOMATIC', 21, false),
+('Modern Studio', 9, 1, 2, 'BY_ACCOMMODATION', 'MANUALLY', 21, false),
+('Historic Mansion', 10, 5, 15, 'BY_ACCOMMODATION', 'AUTOMATIC', 22, false);
 
 INSERT INTO accommodation_benefits (accommodation_id, benefit) VALUES
 (1, 'WIFI'), (1, 'FREE_PARKING'), (1, 'AIR_CONDITIONING'),
@@ -77,8 +77,10 @@ INSERT INTO availabilities (start_date, end_date, is_available, is_deleted, pric
 ('2025-05-26', '2025-05-28', FALSE, FALSE, 342.00, 4),
 
 ('2025-05-11', '2025-05-14', FALSE, FALSE, 500.00, 5),
-('2025-05-26', '2025-05-28', FALSE, FALSE, 544.00, 5);
+('2025-05-26', '2025-05-28', FALSE, FALSE, 544.00, 5),
 
+('2025-07-01', '2025-07-04', TRUE, FALSE, 500.00, 1),
+('2025-07-05', '2025-07-10', TRUE, FALSE, 544.00, 1);
 
 INSERT INTO reservations (start_date, end_date, guest_num, status, is_deleted, is_canceled, accommodation_id, guest_id) VALUES
 ('2025-05-08', '2025-05-09', 2, 'ACCEPTED', FALSE, FALSE, 1, 1),
@@ -95,7 +97,10 @@ INSERT INTO reservations (start_date, end_date, guest_num, status, is_deleted, i
 ('2025-05-26', '2025-05-28', 1, 'ACCEPTED', FALSE, FALSE, 4, 9),
 
 ('2025-05-11', '2025-05-14', 6, 'ACCEPTED', FALSE, FALSE, 5, 10),
-('2025-05-26', '2025-05-28', 3, 'ACCEPTED', FALSE, FALSE, 5, 11);
+('2025-05-26', '2025-05-28', 3, 'ACCEPTED', FALSE, FALSE, 5, 11),
+
+('2025-07-01', '2025-07-04', 3, 'PENDING', FALSE, FALSE, 1, 2),
+('2025-07-05', '2025-07-10', 4, 'PENDING', FALSE, FALSE, 1, 5);
 
 insert into accommodation_photos(accommodation_id,photo_url) VALUES
 (1,'../../assets/images/accommodation1.jpg'),
