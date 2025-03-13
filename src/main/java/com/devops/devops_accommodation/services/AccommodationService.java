@@ -28,17 +28,14 @@ public class AccommodationService {
     @Autowired
     private AccommodationRepository accommodationRepository;
 
-    @Transactional(readOnly = true)
     public Accommodation getById(Integer id){
         return accommodationRepository.findById(id).orElse(null);
     }
 
-    @Transactional(readOnly = true)
     public List<Accommodation> getAllAccommodations(){
         return accommodationRepository.findAll();
     }
 
-  @Transactional(readOnly = true)
     public List<SearchAccommodationResultDTO> searchAccommodations(SearchAccommodationDTO searchDTO) {
         if (searchDTO.getNumGuest() == null || searchDTO.getStartDate() == null || searchDTO.getEndDate() == null) {
             throw new AttributeNullException("Given number of guests or some of dates attributes are null");
@@ -85,11 +82,6 @@ public class AccommodationService {
 
           long totalNights = ChronoUnit.DAYS.between(searchDTO.getStartDate(), searchDTO.getEndDate());
           double unitPrice = totalPrice / totalNights;
-
-          // ✅ Convert Availability entities to DTOs before returning
-          List<AvailabilityDTO> availabilityDTOs = availabilities.stream()
-              .map(AvailabilityDTO::from)
-              .collect(Collectors.toList());
 
           return SearchAccommodationResultDTO.from(
               accommodation,
