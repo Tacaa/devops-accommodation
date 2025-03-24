@@ -75,6 +75,15 @@ public class ReservationController {
         return new ResponseEntity<>(reservations, HttpStatus.OK);
     }
 
+    @GetMapping(value = "/guest/{guestId}")
+    public ResponseEntity<Map<String, Object>> getGuestReservations(@PathVariable Integer guestId) {
+        List<ReservationRequestResponseDTO> reservations = reservationService.getReservationsByGuestId(guestId);
+        Map<String, Object> response = new HashMap<>();
+        response.put("message", null);
+        response.put("data", reservations);
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
     @PostMapping(value = "/save-manually-approved")
     public ResponseEntity<List<ReservationRequestResponseDTO>> saveManuallyApprovedRequests(@RequestBody List<ReservationRequestResponseDTO> reservationRequestResponseDTO){
         List<ReservationRequestResponseDTO> savedReservations = reservationService.saveReservationsManually(reservationRequestResponseDTO);
