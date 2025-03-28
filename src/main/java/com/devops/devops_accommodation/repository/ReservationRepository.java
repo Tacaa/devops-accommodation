@@ -19,6 +19,9 @@ public interface ReservationRepository extends JpaRepository<Reservation, Intege
     @Query("SELECT r FROM Reservation r WHERE r.accommodation.hostId = :hostId AND r.status = 'PENDING' AND r.deleted = false AND r.canceled = false")
     List<Reservation> getAllPendingReservationRequestsByHost(@Param("hostId") Integer hostId);
 
+    @Query("SELECT r FROM Reservation r JOIN FETCH r.accommodation WHERE r.guestId = :guestId AND r.deleted = false")
+    List<Reservation> findByGuestIdAndDeletedFalse(@Param("guestId") Integer guestId);
+
     @Query("SELECT r FROM Reservation r WHERE r.id IN :ids")
     List<Reservation> findListOfReservations(@Param("ids") List<Integer> ids);
 
@@ -35,5 +38,18 @@ public interface ReservationRepository extends JpaRepository<Reservation, Intege
             @Param("accommodation") Accommodation accommodation,
             @Param("startDate") LocalDate startDate,
             @Param("endDate") LocalDate endDate);
+
+
+    @Query("SELECT CASE WHEN COUNT(r) > 0 THEN true ELSE false END " +
+            "FROM Reservation r WHERE r.guestId = :guestId " +
+            "AND (r.startDate >= :today OR (r.startDate < :today AND r.endDate >= :today)) AND r.deleted = false AND r.canceled = false")
+    boolean isGuestHavingReservationAtMoment(@Param("guestId") Integer guestId,
+                                             @Param("today") LocalDate today);
+
+    @Query("SELECT CASE WHEN COUNT(r) > 0 THEN true ELSE false END " +
+            "FROM Reservation r WHERE r.accommodation.id = :accommodationId " +
+            "AND (r.startDate >= :today OR (r.startDate < :today AND r.endDate >= :today)) AND r.deleted = false AND r.canceled = false")
+    boolean isAccommodationHavingReservationAtMoment(@Param("accommodationId") Integer accommodationId,
+                                             @Param("today") LocalDate today);
 }
 

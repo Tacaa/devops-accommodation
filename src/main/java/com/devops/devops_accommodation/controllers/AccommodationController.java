@@ -93,5 +93,11 @@ public class AccommodationController  {
           return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
       }
   }
-  
+
+    @DeleteMapping(value = "/delete-accommodations-of-host")
+    @ResponseStatus(HttpStatus.OK)
+    public void deleteAccommodationsOfHost(@RequestParam Integer hostId){
+        accommodationService.deleteAllHostAccommodations(hostId);
+    }
+
 }
