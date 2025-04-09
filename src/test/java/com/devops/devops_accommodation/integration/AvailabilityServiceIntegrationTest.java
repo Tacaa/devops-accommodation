@@ -49,6 +49,7 @@ public class AvailabilityServiceIntegrationTest extends BaseIntegrationTest {
     private CreateAvailabilityDTO availabilityDTO;
     private Accommodation accommodation;
     private Address address;
+    private String hostId = "16";
 
     @BeforeEach
     void setUp() {
@@ -74,7 +75,7 @@ public class AvailabilityServiceIntegrationTest extends BaseIntegrationTest {
                 .maxGuests(4)
                 .priceType(PriceType.BY_ACCOMMODATION)
                 .requestApproval(RequestApproval.AUTOMATIC)
-                .hostId(16)
+                .hostId(Integer.valueOf(hostId))
                 .build();
         accommodation = accommodationRepository.save(accommodation);
 
@@ -102,7 +103,7 @@ public class AvailabilityServiceIntegrationTest extends BaseIntegrationTest {
 
     @Test
     void createAvailability_ShouldPersistInDatabase_WhenValidInput() {
-        Availability savedAvailability = availabilityService.createAvailability(availabilityDTO);
+        Availability savedAvailability = availabilityService.createAvailability(availabilityDTO, hostId);
 
         assertNotNull(savedAvailability);
         assertEquals(1, availabilityRepository.count());
@@ -119,14 +120,14 @@ public class AvailabilityServiceIntegrationTest extends BaseIntegrationTest {
         availabilityDTO.setAccommodationId(-1);
 
         assertThrows(ResourceNotFoundException.class, () -> {
-            availabilityService.createAvailability(availabilityDTO);
+            availabilityService.createAvailability(availabilityDTO, hostId);
         });
     }
 
     @Test
     void createAvailability_ShouldThrowException_WhenPeriodOverlaps() {
         // Create first availability
-        availabilityService.createAvailability(availabilityDTO);
+        availabilityService.createAvailability(availabilityDTO, hostId);
 
         // Try to create overlapping availability
         CreateAvailabilityDTO overlappingDTO = CreateAvailabilityDTO.builder()
@@ -138,13 +139,13 @@ public class AvailabilityServiceIntegrationTest extends BaseIntegrationTest {
                 .build();
 
         assertThrows(PeriodNotAvailable.class, () -> {
-            availabilityService.createAvailability(overlappingDTO);
+            availabilityService.createAvailability(overlappingDTO, hostId);
         });
     }
 
     @Test
     void getAllAvailabilities_ShouldReturnList_WhenAccommodationExists() {
-        availabilityService.createAvailability(availabilityDTO);
+        availabilityService.createAvailability(availabilityDTO, hostId);
 
         List<Availability> availabilities = availabilityService.getAllAvailabilitiesByAccommodationId(accommodation.getId());
 
@@ -154,7 +155,7 @@ public class AvailabilityServiceIntegrationTest extends BaseIntegrationTest {
 
     @Test
     void updateAvailability_ShouldUpdateDatabase_WhenValidInput() {
-        Availability savedAvailability = availabilityService.createAvailability(availabilityDTO);
+        Availability savedAvailability = availabilityService.createAvailability(availabilityDTO, hostId);
 
         CreateAvailabilityDTO updateDTO = CreateAvailabilityDTO.builder()
                 .startDate(availabilityDTO.getStartDate())
@@ -164,7 +165,7 @@ public class AvailabilityServiceIntegrationTest extends BaseIntegrationTest {
                 .accommodationId(accommodation.getId())
                 .build();
 
-        Availability updatedAvailability = availabilityService.updateAvailability(savedAvailability.getId(), updateDTO);
+        Availability updatedAvailability = availabilityService.updateAvailability(savedAvailability.getId(), updateDTO, hostId);
 
         assertNotNull(updatedAvailability);
         assertEquals(200.0, updatedAvailability.getPrice());

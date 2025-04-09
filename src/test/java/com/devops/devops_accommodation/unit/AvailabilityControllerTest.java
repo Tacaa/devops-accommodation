@@ -39,12 +39,14 @@ public class AvailabilityControllerTest {
     private CreateAvailabilityDTO createAvailabilityDTO;
     private Availability availability;
     private Accommodation accommodation;
+    private String hostId = "16";
 
     @BeforeEach
     void setUp() {
         accommodation = new Accommodation();
         accommodation.setId(1);
         accommodation.setName("Test Accommodation");
+        accommodation.setHostId(Integer.valueOf(hostId));
 
         createAvailabilityDTO = CreateAvailabilityDTO.builder()
                 .startDate(LocalDate.now())
@@ -66,10 +68,10 @@ public class AvailabilityControllerTest {
 
     @Test
     void createAvailability_ShouldReturn201_WhenValidRequest() {
-        when(availabilityService.createAvailability(any(CreateAvailabilityDTO.class)))
+        when(availabilityService.createAvailability(any(CreateAvailabilityDTO.class), eq(hostId)))
                 .thenReturn(availability);
 
-        ResponseEntity<Map<String, Object>> response = availabilityController.createAvailability(createAvailabilityDTO);
+        ResponseEntity<Map<String, Object>> response = availabilityController.createAvailability(createAvailabilityDTO, hostId);
 
         assertEquals(HttpStatus.CREATED, response.getStatusCode());
         assertNotNull(response.getBody());
@@ -83,10 +85,10 @@ public class AvailabilityControllerTest {
 
     @Test
     void createAvailability_ShouldReturn400_WhenPeriodNotAvailable() {
-        when(availabilityService.createAvailability(any(CreateAvailabilityDTO.class)))
+        when(availabilityService.createAvailability(any(CreateAvailabilityDTO.class), eq(hostId)))
                 .thenThrow(new PeriodNotAvailable("Period is not available"));
 
-        ResponseEntity<Map<String, Object>> response = availabilityController.createAvailability(createAvailabilityDTO);
+        ResponseEntity<Map<String, Object>> response = availabilityController.createAvailability(createAvailabilityDTO, hostId);
 
         assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
         assertNotNull(response.getBody());
@@ -96,10 +98,10 @@ public class AvailabilityControllerTest {
 
     @Test
     void createAvailability_ShouldReturn404_WhenAccommodationNotFound() {
-        when(availabilityService.createAvailability(any(CreateAvailabilityDTO.class)))
+        when(availabilityService.createAvailability(any(CreateAvailabilityDTO.class), eq(hostId)))
                 .thenThrow(new ResourceNotFoundException("Accommodation not found"));
 
-        ResponseEntity<Map<String, Object>> response = availabilityController.createAvailability(createAvailabilityDTO);
+        ResponseEntity<Map<String, Object>> response = availabilityController.createAvailability(createAvailabilityDTO, hostId);
 
         assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
         assertNotNull(response.getBody());
@@ -109,10 +111,10 @@ public class AvailabilityControllerTest {
 
     @Test
     void updateAvailability_ShouldReturn200_WhenValidRequest() {
-        when(availabilityService.updateAvailability(eq(1), any(CreateAvailabilityDTO.class)))
+        when(availabilityService.updateAvailability(eq(1), any(CreateAvailabilityDTO.class), eq(hostId)))
                 .thenReturn(availability);
 
-        ResponseEntity<Map<String, Object>> response = availabilityController.updateAvailability(1, createAvailabilityDTO);
+        ResponseEntity<Map<String, Object>> response = availabilityController.updateAvailability(1, createAvailabilityDTO, hostId);
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertNotNull(response.getBody());
@@ -126,10 +128,10 @@ public class AvailabilityControllerTest {
 
     @Test
     void updateAvailability_ShouldReturn404_WhenAvailabilityNotFound() {
-        when(availabilityService.updateAvailability(eq(1), any(CreateAvailabilityDTO.class)))
+        when(availabilityService.updateAvailability(eq(1), any(CreateAvailabilityDTO.class), eq(hostId)))
                 .thenThrow(new ResourceNotFoundException("Availability not found"));
 
-        ResponseEntity<Map<String, Object>> response = availabilityController.updateAvailability(1, createAvailabilityDTO);
+        ResponseEntity<Map<String, Object>> response = availabilityController.updateAvailability(1, createAvailabilityDTO, hostId);
 
         assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
         assertNotNull(response.getBody());
@@ -139,10 +141,10 @@ public class AvailabilityControllerTest {
 
     @Test
     void updateAvailability_ShouldReturn400_WhenPeriodNotAvailable() {
-        when(availabilityService.updateAvailability(eq(1), any(CreateAvailabilityDTO.class)))
+        when(availabilityService.updateAvailability(eq(1), any(CreateAvailabilityDTO.class), eq(hostId)))
                 .thenThrow(new PeriodNotAvailable("Cannot update availability for this interval"));
 
-        ResponseEntity<Map<String, Object>> response = availabilityController.updateAvailability(1, createAvailabilityDTO);
+        ResponseEntity<Map<String, Object>> response = availabilityController.updateAvailability(1, createAvailabilityDTO, hostId);
 
         assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
         assertNotNull(response.getBody());

@@ -40,12 +40,14 @@ public class AvailabilityServiceUnitTest {
 
     private CreateAvailabilityDTO availabilityDTO;
     private Accommodation accommodation;
+    private String hostId = "16";
 
     @BeforeEach
     void setUp() {
         accommodation = new Accommodation();
         accommodation.setId(1);
         accommodation.setName("Test Accommodation");
+        accommodation.setHostId(Integer.valueOf(hostId));
 
         availabilityDTO = CreateAvailabilityDTO.builder()
                 .startDate(LocalDate.now())
@@ -67,7 +69,7 @@ public class AvailabilityServiceUnitTest {
         availability.setPrice(availabilityDTO.getPrice());
         when(availabilityRepository.save(any(Availability.class))).thenReturn(availability);
 
-        Availability createdAvailability = availabilityService.createAvailability(availabilityDTO);
+        Availability createdAvailability = availabilityService.createAvailability(availabilityDTO, hostId);
 
         assertNotNull(createdAvailability);
         assertEquals(availabilityDTO.getPrice(), createdAvailability.getPrice());
@@ -79,7 +81,7 @@ public class AvailabilityServiceUnitTest {
         when(accommodationRepository.findById(any())).thenReturn(Optional.empty());
 
         assertThrows(ResourceNotFoundException.class, () -> {
-            availabilityService.createAvailability(availabilityDTO);
+            availabilityService.createAvailability(availabilityDTO, hostId);
         });
 
         verify(availabilityRepository, never()).save(any(Availability.class));
@@ -91,7 +93,7 @@ public class AvailabilityServiceUnitTest {
         when(reservationRepository.existsByAccommodationAndDateRange(any(), any(), any())).thenReturn(true);
 
         assertThrows(PeriodNotAvailable.class, () -> {
-            availabilityService.createAvailability(availabilityDTO);
+            availabilityService.createAvailability(availabilityDTO, hostId);
         });
 
         verify(availabilityRepository, never()).save(any(Availability.class));
@@ -109,7 +111,7 @@ public class AvailabilityServiceUnitTest {
         when(reservationRepository.existsByAccommodationAndDateRange(any(), any(), any())).thenReturn(false);
         when(availabilityRepository.save(any(Availability.class))).thenReturn(existingAvailability);
 
-        Availability updatedAvailability = availabilityService.updateAvailability(1, availabilityDTO);
+        Availability updatedAvailability = availabilityService.updateAvailability(1, availabilityDTO, hostId);
 
         assertNotNull(updatedAvailability);
         verify(availabilityRepository, times(1)).save(any(Availability.class));
@@ -120,7 +122,7 @@ public class AvailabilityServiceUnitTest {
         when(availabilityRepository.findById(any())).thenReturn(Optional.empty());
 
         assertThrows(ResourceNotFoundException.class, () -> {
-            availabilityService.updateAvailability(1, availabilityDTO);
+            availabilityService.updateAvailability(1, availabilityDTO, hostId);
         });
 
         verify(availabilityRepository, never()).save(any(Availability.class));
