@@ -1,5 +1,6 @@
 package com.devops.devops_accommodation.unit;
 
+import com.devops.devops_accommodation.client.NotificationClient;
 import com.devops.devops_accommodation.dto.*;
 import com.devops.devops_accommodation.enumeration.RequestApproval;
 import com.devops.devops_accommodation.enumeration.RequestStatus;
@@ -42,6 +43,9 @@ class ReservationServiceTest {
 
     @InjectMocks
     private ReservationService reservationService;
+
+    @Mock
+    private NotificationClient notificationClient;
 
     private Address address;
     private Accommodation accommodation;
