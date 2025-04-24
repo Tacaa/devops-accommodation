@@ -19,6 +19,9 @@ public interface ReservationRepository extends JpaRepository<Reservation, Intege
     @Query("SELECT r FROM Reservation r WHERE r.accommodation.hostId = :hostId AND r.status = 'PENDING' AND r.deleted = false AND r.canceled = false")
     List<Reservation> getAllPendingReservationRequestsByHost(@Param("hostId") Integer hostId);
 
+    @Query("SELECT r FROM Reservation r JOIN FETCH r.accommodation WHERE r.guestId = :guestId AND r.deleted = false")
+    List<Reservation> findByGuestIdAndDeletedFalse(@Param("guestId") Integer guestId);
+
     @Query("SELECT r FROM Reservation r WHERE r.id IN :ids")
     List<Reservation> findListOfReservations(@Param("ids") List<Integer> ids);
 

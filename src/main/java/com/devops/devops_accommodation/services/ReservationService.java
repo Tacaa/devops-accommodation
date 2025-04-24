@@ -156,6 +156,13 @@ public class ReservationService {
                 .toList();
     }
 
+    public List<ReservationRequestResponseDTO> getReservationsByGuestId(Integer guestId) {
+        List<Reservation> reservations = reservationRepository.findByGuestIdAndDeletedFalse(guestId);
+        return reservations.stream()
+            .map(ReservationRequestResponseDTO::from)
+            .collect(Collectors.toList());
+    }
+
     public List<ReservationRequestResponseDTO> saveReservationsManually(List<ReservationRequestResponseDTO> reservations) {
         List<Integer> ids = reservations.stream()
                 .map(ReservationRequestResponseDTO::getId)
