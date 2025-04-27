@@ -3,6 +3,7 @@ package com.devops.devops_accommodation.services;
 import com.devops.devops_accommodation.dto.CreateAvailabilityDTO;
 import com.devops.devops_accommodation.exceptions.PeriodNotAvailable;
 import com.devops.devops_accommodation.exceptions.ResourceNotFoundException;
+import com.devops.devops_accommodation.exceptions.WrongHostException;
 import com.devops.devops_accommodation.model.Accommodation;
 import com.devops.devops_accommodation.model.Availability;
 import com.devops.devops_accommodation.repository.AccommodationRepository;
@@ -12,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
 
 @Service
 public class AvailabilityService {
@@ -28,9 +30,13 @@ public class AvailabilityService {
         return availabilityRepository.findByAccommodationId(accommodationId);
     }
 
-    public Availability createAvailability(CreateAvailabilityDTO createAvailabilityDTO) {
+    public Availability createAvailability(CreateAvailabilityDTO createAvailabilityDTO, String hostId) {
         Accommodation accommodation = accommodationRepository.findById(createAvailabilityDTO.getAccommodationId())
                 .orElseThrow(() -> new ResourceNotFoundException("Accommodation not found"));
+
+        if(!hostId.equals(String.valueOf(accommodation.getHostId().intValue()))){
+            throw new WrongHostException("The host cannot change the availability for someone else's accommodation.");
+        }
 
         boolean hasReservations = reservationRepository.existsByAccommodationAndDateRange(accommodation, createAvailabilityDTO.getStartDate(), createAvailabilityDTO.getEndDate());
         if (hasReservations) {
@@ -53,9 +59,13 @@ public class AvailabilityService {
     }
 
 
-    public Availability updateAvailability(Integer availabilityId, CreateAvailabilityDTO createAvailabilityDTO) {
+    public Availability updateAvailability(Integer availabilityId, CreateAvailabilityDTO createAvailabilityDTO, String hostId) {
         Availability availability = availabilityRepository.findById(availabilityId)
                 .orElseThrow(() -> new ResourceNotFoundException("Availability not found"));
+
+        if(!hostId.equals(String.valueOf(availability.getAccommodation().getHostId().intValue()))){
+            throw new WrongHostException("The host cannot change the availability for someone else's accommodation.");
+        }
 
         boolean hasReservations = reservationRepository.existsByAccommodationAndDateRange(availability.getAccommodation(), createAvailabilityDTO.getStartDate(), createAvailabilityDTO.getEndDate());
         if (hasReservations) {

@@ -1,7 +1,10 @@
 package com.devops.devops_accommodation.services;
 
+import com.devops.devops_accommodation.client.NotificationClient;
+import com.devops.devops_accommodation.dto.CreateNotificationDTO;
 import com.devops.devops_accommodation.dto.ReservationRequestDTO;
 import com.devops.devops_accommodation.dto.ReservationRequestResponseDTO;
+import com.devops.devops_accommodation.enumeration.NotificationType;
 import com.devops.devops_accommodation.enumeration.RequestApproval;
 import com.devops.devops_accommodation.enumeration.RequestStatus;
 import com.devops.devops_accommodation.exceptions.AvailabilityNotExists;
@@ -35,6 +38,9 @@ public class ReservationService {
     @Autowired
     private AvailabilityRepository availabilityRepository;
 
+    @Autowired
+    private NotificationClient notificationClient;
+
     public ReservationRequestResponseDTO createReservationRequest(ReservationRequestDTO requestDTO) {
         Accommodation accommodation = accommodationRepository.findById(requestDTO.getAccommodationId())
                 .orElseThrow(() -> new NotFoundException("Accommodation not found"));
@@ -62,6 +68,17 @@ public class ReservationService {
         reservation = this.updateRequestStatus(reservation);
 
         reservation = reservationRepository.save(reservation);
+
+        //posalji notifikaciju
+        CreateNotificationDTO notificationDTO = CreateNotificationDTO.builder()
+                .receiverId(accommodation.getHostId())
+                .senderId(reservation.getGuestId())
+                .title("Reservation Request")
+                .content("Request for booking " + accommodation.getName())
+                .notificationType(NotificationType.RESERVATION_REQUEST)
+                .build();
+        notificationClient.sendNotification(notificationDTO);
+
         return ReservationRequestResponseDTO.from(reservation);
     }
 
@@ -85,6 +102,17 @@ public class ReservationService {
         if(reservation.getStatus() == RequestStatus.PENDING){
             reservation.setDeleted(true);
             reservationRepository.save(reservation);
+
+            //posalji notifikaciju
+            CreateNotificationDTO notificationDTO = CreateNotificationDTO.builder()
+                    .receiverId(reservation.getAccommodation().getHostId())
+                    .senderId(reservation.getGuestId())
+                    .title("Pending Reservation Cancel")
+                    .content("Reservation Cancel for accommodation " + reservation.getAccommodation().getName())
+                    .notificationType(NotificationType.RESERVATION_CANCELATION)
+                    .build();
+            notificationClient.sendNotification(notificationDTO);
+
             return ReservationRequestResponseDTO.from(reservation);
         }else if(reservation.getStatus() == RequestStatus.ACCEPTED){
             LocalDate today = LocalDate.now();
@@ -103,6 +131,17 @@ public class ReservationService {
 
                 //TODO: kod usera povecati broj otkaza, ili na frontu ili na bek
                 reservationRepository.save(reservation);
+
+                //posalji notifikaciju
+                CreateNotificationDTO notificationDTO = CreateNotificationDTO.builder()
+                        .receiverId(reservation.getAccommodation().getHostId())
+                        .senderId(reservation.getGuestId())
+                        .title("Accepted Reservation Cancel")
+                        .content("Reservation Cancel for accommodation " + reservation.getAccommodation().getName())
+                        .notificationType(NotificationType.RESERVATION_CANCELATION)
+                        .build();
+                notificationClient.sendNotification(notificationDTO);
+
                 return ReservationRequestResponseDTO.from(reservation);
             }
         }else{
@@ -139,9 +178,30 @@ public class ReservationService {
             if (matchingReservation != null) {
                 reservation.setStatus(matchingReservation.getStatus());
                 if(matchingReservation.getStatus() == RequestStatus.ACCEPTED){
+
+                    //posalji notifikaciju
+                    CreateNotificationDTO notificationDTO = CreateNotificationDTO.builder()
+                            .receiverId(reservation.getGuestId())
+                            .senderId(reservation.getAccommodation().getHostId())
+                            .title("Host Response")
+                            .content("Host accepted reservation for accommodation " + reservation.getAccommodation().getName())
+                            .notificationType(NotificationType.HOST_RESPONSE)
+                            .build();
+                    notificationClient.sendNotification(notificationDTO);
+
                     this.updateAvailabilityAfterReservation(reservation);
                 }else if(matchingReservation.getStatus() == RequestStatus.DECLINED){
                     reservation.setCanceled(true);
+
+                    //posalji notifikaciju
+                    CreateNotificationDTO notificationDTO = CreateNotificationDTO.builder()
+                            .receiverId(reservation.getGuestId())
+                            .senderId(reservation.getAccommodation().getHostId())
+                            .title("Host Response")
+                            .content("Host declined reservation for accommodation " + reservation.getAccommodation().getName())
+                            .notificationType(NotificationType.HOST_RESPONSE)
+                            .build();
+                    notificationClient.sendNotification(notificationDTO);
                 }
             }
         });

@@ -1,9 +1,6 @@
 package com.devops.devops_accommodation.controllers;
 
-import com.devops.devops_accommodation.dto.AccommodationDTO;
-import com.devops.devops_accommodation.dto.SearchAccommodationDTO;
-import com.devops.devops_accommodation.dto.SearchAccommodationResultDTO;
-import com.devops.devops_accommodation.dto.CreateAccommodationDTO;
+import com.devops.devops_accommodation.dto.*;
 import com.devops.devops_accommodation.exceptions.AttributeNotUniqueException;
 import com.devops.devops_accommodation.exceptions.AttributeNullException;
 import com.devops.devops_accommodation.model.Accommodation;
@@ -35,6 +32,17 @@ public class AccommodationController  {
 
         AccommodationDTO accommodationDTO = AccommodationDTO.from(accommodation);
         return new ResponseEntity<>(accommodationDTO, HttpStatus.OK);
+    }
+
+    //za notifikacije u review servisu
+    @GetMapping(value = "/data/{id}")
+    public AccommodationNotificationData getAccommodationData(@PathVariable Integer id) {
+        Accommodation accommodation = accommodationService.getById(id);
+        AccommodationNotificationData accommodationNotificationData = AccommodationNotificationData.builder()
+                .accommodationName(accommodation.getName())
+                .accommodationHostId(accommodation.getHostId())
+                .build();
+        return accommodationNotificationData;
     }
 
 

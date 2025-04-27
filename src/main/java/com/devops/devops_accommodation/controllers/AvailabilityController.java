@@ -5,6 +5,7 @@ import com.devops.devops_accommodation.dto.AvailabilityDTO;
 import com.devops.devops_accommodation.dto.CreateAvailabilityDTO;
 import com.devops.devops_accommodation.exceptions.PeriodNotAvailable;
 import com.devops.devops_accommodation.exceptions.ResourceNotFoundException;
+import com.devops.devops_accommodation.exceptions.WrongHostException;
 import com.devops.devops_accommodation.model.Availability;
 import com.devops.devops_accommodation.services.AvailabilityService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,15 +37,15 @@ public class AvailabilityController {
     }
 
     @PostMapping
-    public ResponseEntity<Map<String, Object>> createAvailability(@RequestBody CreateAvailabilityDTO createAvailabilityDTO) {
+    public ResponseEntity<Map<String, Object>> createAvailability(@RequestBody CreateAvailabilityDTO createAvailabilityDTO,  @RequestHeader("X-User-Id") String userId) {
         try {
-            Availability availability = availabilityService.createAvailability(createAvailabilityDTO);
+            Availability availability = availabilityService.createAvailability(createAvailabilityDTO, userId);
             Map<String, Object> response = new HashMap<>();
             response.put("message", null);
             response.put("data", AvailabilityDTO.from(availability));
             return new ResponseEntity<>(response, HttpStatus.CREATED);
 
-        } catch (PeriodNotAvailable e) {
+        } catch (PeriodNotAvailable | WrongHostException e) {
             Map<String, Object> response = new HashMap<>();
             response.put("message", e.getMessage());
             response.put("data", null);
@@ -62,15 +63,16 @@ public class AvailabilityController {
     @PutMapping("/{availabilityId}")
     public ResponseEntity<Map<String, Object>> updateAvailability(
             @PathVariable Integer availabilityId,
-            @RequestBody CreateAvailabilityDTO createAvailabilityDTO) {
+            @RequestBody CreateAvailabilityDTO createAvailabilityDTO,
+            @RequestHeader("X-User-Id") String userId) {
         try {
-            Availability availability = availabilityService.updateAvailability(availabilityId, createAvailabilityDTO);
+            Availability availability = availabilityService.updateAvailability(availabilityId, createAvailabilityDTO, userId);
             Map<String, Object> response = new HashMap<>();
             response.put("message", null);
             response.put("data", AvailabilityDTO.from(availability));
             return new ResponseEntity<>(response, HttpStatus.OK);
 
-        } catch (PeriodNotAvailable e) {
+        } catch (PeriodNotAvailable  | WrongHostException e) {
             Map<String, Object> response = new HashMap<>();
             response.put("message", e.getMessage());
             response.put("data", null);
