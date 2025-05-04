@@ -17,6 +17,7 @@ import com.devops.devops_accommodation.model.Reservation;
 import com.devops.devops_accommodation.repository.AccommodationRepository;
 import com.devops.devops_accommodation.repository.AvailabilityRepository;
 import com.devops.devops_accommodation.repository.ReservationRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -26,6 +27,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 public class ReservationService {
 
@@ -42,17 +44,24 @@ public class ReservationService {
     private NotificationClient notificationClient;
 
     public ReservationRequestResponseDTO createReservationRequest(ReservationRequestDTO requestDTO) {
+        log.info("Creating reservation request for user {} on accommodation {}", requestDTO.getUserId(), requestDTO.getAccommodationId());
+
         Accommodation accommodation = accommodationRepository.findById(requestDTO.getAccommodationId())
-                .orElseThrow(() -> new NotFoundException("Accommodation not found"));
+                .orElseThrow(() -> {
+                    log.warn("Accommodation not found with ID: {}", requestDTO.getAccommodationId());
+                    return new NotFoundException("Accommodation not found");
+                });
 
         boolean isConflict = reservationRepository.existsReservation(
                 accommodation.getId(), requestDTO.getStartDate(), requestDTO.getEndDate());
         if (isConflict) {
+            log.warn("Reservation conflict detected for accommodation {} during {} to {}", accommodation.getId(), requestDTO.getStartDate(), requestDTO.getEndDate());
             throw new ReservationConflictException("This accommodation is already reserved for the given date range");
         }
 
         boolean exist = accommodationRepository.checkAccommodationsAvailability(accommodation.getId(), requestDTO.getStartDate(), requestDTO.getEndDate());
         if(!exist){
+            log.warn("No availability found for accommodation {} during requested period", accommodation.getId());
             throw new AvailabilityNotExists("There is no availability for this accommodation in this period of time!");
         }
 
@@ -68,6 +77,7 @@ public class ReservationService {
         reservation = this.updateRequestStatus(reservation);
 
         reservation = reservationRepository.save(reservation);
+        log.info("Reservation created with ID: {}", reservation.getId());
 
         //posalji notifikaciju
         CreateNotificationDTO notificationDTO = CreateNotificationDTO.builder()
@@ -78,30 +88,42 @@ public class ReservationService {
                 .notificationType(NotificationType.RESERVATION_REQUEST)
                 .build();
         notificationClient.sendNotification(notificationDTO);
+        log.info("Notification sent to host {}", accommodation.getHostId());
 
         return ReservationRequestResponseDTO.from(reservation);
     }
 
 
     public Reservation updateRequestStatus(Reservation reservation){
+        log.debug("Updating request status for reservation...");
+
         if(reservation.getAccommodation().getRequestApproval() == RequestApproval.AUTOMATIC){
             reservation.setStatus(RequestStatus.ACCEPTED);
+            log.info("Reservation automatically accepted.");
+
             //update availability
             this.updateAvailabilityAfterReservation(reservation);
             return reservation;
         }else{
             //manuelno
             reservation.setStatus(RequestStatus.PENDING);
+            log.info("Reservation set to pending.");
             return reservation;
         }
     }
 
     public ReservationRequestResponseDTO cancelOrDelete(Integer id){
-        Reservation reservation = reservationRepository.findById(id).orElseThrow(() -> new NotFoundException("Reservation not found"));
+        log.info("Cancelling or deleting reservation with ID: {}", id);
+
+        Reservation reservation = reservationRepository.findById(id).orElseThrow(() -> {
+            log.warn("Reservation not found with ID: {}", id);
+            return new NotFoundException("Reservation not found");
+        });
 
         if(reservation.getStatus() == RequestStatus.PENDING){
             reservation.setDeleted(true);
             reservationRepository.save(reservation);
+            log.info("Pending reservation marked as deleted");
 
             //posalji notifikaciju
             CreateNotificationDTO notificationDTO = CreateNotificationDTO.builder()
@@ -112,11 +134,13 @@ public class ReservationService {
                     .notificationType(NotificationType.RESERVATION_CANCELATION)
                     .build();
             notificationClient.sendNotification(notificationDTO);
+            log.info("Sent notification!");
 
             return ReservationRequestResponseDTO.from(reservation);
         }else if(reservation.getStatus() == RequestStatus.ACCEPTED){
             LocalDate today = LocalDate.now();
             if (today.equals(reservation.getStartDate().minusDays(1)) | today.isAfter(reservation.getStartDate().minusDays(1))) {
+                log.warn("Cancellation too late for reservation {}", reservation.getId());
                 throw new ReservationCanNotCancel("Too late to cancel reservation!");
             } else {
                 reservation.setCanceled(true);
@@ -125,7 +149,9 @@ public class ReservationService {
                 if(availability != null){
                     availability.setAvailable(true);
                     availabilityRepository.save(availability);
+                    log.info("Availability restored for canceled reservation.");
                 }else{
+                    log.error("Availability not found for canceled reservation");
                     throw new NotFoundException("Availability not found!");
                 }
 
@@ -141,15 +167,19 @@ public class ReservationService {
                         .notificationType(NotificationType.RESERVATION_CANCELATION)
                         .build();
                 notificationClient.sendNotification(notificationDTO);
+                log.info("Sent notification!");
 
                 return ReservationRequestResponseDTO.from(reservation);
             }
         }else{
+            log.warn("Reservation already declined, cannot cancel.");
             throw new ReservationCanNotCancel("Reservation is already declined");
         }
     }
 
     public List<ReservationRequestResponseDTO> getAllPendingReservationRequestsByHost(Integer id){
+        log.info("Fetching all pending reservations for host ID: {}", id);
+
         List<Reservation> reservations = reservationRepository.getAllPendingReservationRequestsByHost(id);
         return reservations.stream()
                 .map(ReservationRequestResponseDTO::from)
@@ -157,6 +187,8 @@ public class ReservationService {
     }
 
     public List<ReservationRequestResponseDTO> getReservationsByGuestId(Integer guestId) {
+        log.info("Fetching reservations for guest ID: {}", guestId);
+
         List<Reservation> reservations = reservationRepository.findByGuestIdAndDeletedFalse(guestId);
         return reservations.stream()
             .map(ReservationRequestResponseDTO::from)
@@ -164,6 +196,8 @@ public class ReservationService {
     }
 
     public List<ReservationRequestResponseDTO> saveReservationsManually(List<ReservationRequestResponseDTO> reservations) {
+        log.info("Manually saving reservation statuses for {} reservations", reservations.size());
+
         List<Integer> ids = reservations.stream()
                 .map(ReservationRequestResponseDTO::getId)
                 .toList();
@@ -178,6 +212,7 @@ public class ReservationService {
             if (matchingReservation != null) {
                 reservation.setStatus(matchingReservation.getStatus());
                 if(matchingReservation.getStatus() == RequestStatus.ACCEPTED){
+                    log.info("Reservation ID {} manually accepted", reservation.getId());
 
                     //posalji notifikaciju
                     CreateNotificationDTO notificationDTO = CreateNotificationDTO.builder()
@@ -188,10 +223,12 @@ public class ReservationService {
                             .notificationType(NotificationType.HOST_RESPONSE)
                             .build();
                     notificationClient.sendNotification(notificationDTO);
+                    log.info("Notification sent!");
 
                     this.updateAvailabilityAfterReservation(reservation);
                 }else if(matchingReservation.getStatus() == RequestStatus.DECLINED){
                     reservation.setCanceled(true);
+                    log.info("Reservation ID {} manually declined", reservation.getId());
 
                     //posalji notifikaciju
                     CreateNotificationDTO notificationDTO = CreateNotificationDTO.builder()
@@ -202,6 +239,7 @@ public class ReservationService {
                             .notificationType(NotificationType.HOST_RESPONSE)
                             .build();
                     notificationClient.sendNotification(notificationDTO);
+                    log.info("Notification sent!");
                 }
             }
         });
@@ -215,6 +253,8 @@ public class ReservationService {
 
 
     public void updateAvailabilityAfterReservation(Reservation reservation) {
+        log.info("Updating availability after reservation ID: {}", reservation.getId());
+
         List<Availability> availabilities = availabilityRepository.findAvailabilitiesForReservation(reservation.getAccommodation().getId(), reservation.getStartDate(), reservation.getEndDate());
 
         for (Availability availability : availabilities) {
@@ -269,19 +309,24 @@ public class ReservationService {
 
     //za potrebe ocjene
     public boolean didGuestHadReservationInAccommodation(Integer guestId, Integer accommodationId){
+        log.debug("Checking if guest {} had a reservation in accommodation {}", guestId, accommodationId);
         return reservationRepository.didGuestHadReservationInAccommodation(accommodationId, guestId);
     }
 
     public boolean didGuestHadReservationInHostAccommodation(Integer guestId, Integer hostId){
+        log.debug("Checking if guest {} had a reservation in host {}'s accommodation", guestId, hostId);
         return reservationRepository.didGuestHadReservationInHostAccommodation(hostId, guestId);
     }
 
     public boolean isGuestHavingReservationAtMoment(Integer guestId) {
+        log.debug("Checking if guest {} has an active reservation", guestId);
         return reservationRepository.isGuestHavingReservationAtMoment(guestId, LocalDate.now());
     }
 
     public boolean isHostHavingReservationAtMoment(Integer hostId) {
-       //pronadji sve smjestaje jednog hosta
+        log.debug("Checking if host {} has any active reservations", hostId);
+
+        //pronadji sve smjestaje jednog hosta
         List<Accommodation> allAccommodationsOfHost = accommodationRepository.findAllByHostId(hostId);
 
         //nad svakim provjeri da li postoji rezervacija, prvi koji pronadjes vracas false

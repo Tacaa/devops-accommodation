@@ -12,6 +12,7 @@ import com.devops.devops_accommodation.dto.CreateAddressDTO;
 import com.devops.devops_accommodation.exceptions.AttributeNullException;
 import com.devops.devops_accommodation.model.Address;
 import com.devops.devops_accommodation.repository.AccommodationRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -21,7 +22,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.stream.Collectors;
 
-
+@Slf4j
 @Service
 public class AccommodationService {
 
@@ -29,15 +30,20 @@ public class AccommodationService {
     private AccommodationRepository accommodationRepository;
 
     public Accommodation getById(Integer id){
+        log.info("Fetching accommodation with ID: {}", id);
         return accommodationRepository.findById(id).orElse(null);
     }
 
     public List<Accommodation> getAllAccommodations(){
+        log.info("Fetching all accommodations");
         return accommodationRepository.findAll();
     }
 
     public List<SearchAccommodationResultDTO> searchAccommodations(SearchAccommodationDTO searchDTO) {
+        log.info("Searching accommodations with parameters: {}", searchDTO);
+
         if (searchDTO.getNumGuest() == null || searchDTO.getStartDate() == null || searchDTO.getEndDate() == null) {
+            log.warn("Missing required search attributes: {}", searchDTO);
             throw new AttributeNullException("Given number of guests or some of dates attributes are null");
         }
 
@@ -53,6 +59,7 @@ public class AccommodationService {
             accommodations.removeIf(a -> a.getId().equals(reserved.getId()));
         }
 
+        log.debug("Available accommodations after filtering: {}", accommodations.size());
     return accommodations.stream()
         .map(accommodation -> {
           List<Availability> availabilities = accommodation.getAvailabilities().stream()
@@ -62,7 +69,8 @@ public class AccommodationService {
               .collect(Collectors.toList());
 
           if (availabilities.isEmpty()) {
-            throw new RuntimeException("No availabilities found for the specified period");
+              log.warn("No availabilities found for accommodation ID {} in requested period", accommodation.getId());
+              throw new RuntimeException("No availabilities found for the specified period");
           }
 
           double totalPrice = 0.0;
@@ -94,6 +102,8 @@ public class AccommodationService {
   }
 
     public Accommodation create(CreateAccommodationDTO createAccommodationDTO) {
+        log.info("Creating accommodation for host ID: {}", createAccommodationDTO.getHostId());
+
         if(createAccommodationDTO.getName() == null
                 || createAccommodationDTO.getBenefits() == null
                 || createAccommodationDTO.getMinGuests() == null
@@ -103,6 +113,7 @@ public class AccommodationService {
                 || createAccommodationDTO.getHostId() == null
                 ||  createAccommodationDTO.getPhotos() == null
                 || createAccommodationDTO.getAddress() == null){
+            log.error("Accommodation creation failed due to missing attributes: {}", createAccommodationDTO);
             throw new AttributeNullException("Given accommodation attribute is null");
         }
 
@@ -110,6 +121,7 @@ public class AccommodationService {
             || createAccommodationDTO.getAddress().getNumber() == null
                 || createAccommodationDTO.getAddress().getStreet() == null
                 || createAccommodationDTO.getAddress().getCountry() == null){
+            log.error("Accommodation creation failed due to missing address attributes: {}", createAccommodationDTO.getAddress());
             throw new AttributeNullException("Given address attribute is null");
         }
 
@@ -127,16 +139,18 @@ public class AccommodationService {
                 .hostId(createAccommodationDTO.getHostId())
                 .deleted(false)
                 .build();
-
         return accommodationRepository.save(accommodation);
     }
 
     public void deleteAllHostAccommodations(Integer hostId){
+        log.info("Deleting all accommodations for host ID: {}", hostId);
+
         List<Accommodation> allAccommodationsOfHost = accommodationRepository.findAllByHostId(hostId);
         for(Accommodation accommodation : allAccommodationsOfHost){
             accommodation.setDeleted(true);
         }
         accommodationRepository.saveAll(allAccommodationsOfHost);
+        log.info("Marked {} accommodations as deleted for host ID: {}", allAccommodationsOfHost.size(), hostId);
     }
 
 }
