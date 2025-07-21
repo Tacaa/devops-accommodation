@@ -66,8 +66,8 @@ class ReservationServiceTest {
 
         reservationRequestDTO = ReservationRequestDTO.builder()
                 .accommodationId(1)
-                .startDate(LocalDate.of(2025, 5, 1))
-                .endDate(LocalDate.of(2025, 5, 7))
+                .startDate(LocalDate.of(2025, 7, 23))
+                .endDate(LocalDate.of(2025, 7, 29))
                 .numGuests(2)
                 .userId(1)
                 .build();
